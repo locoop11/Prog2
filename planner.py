@@ -123,14 +123,15 @@ class maePlanner:
     
 
 class schedulePlanner:
-    def __init__(self, doctors, maes, previouSchedule):
+    def __init__(self, doctors, maes, schedule):
         self.doctors = doctors
         self.maes = maes
-        self.previousSched = previouSchedule
-        self.previousScheduleTime = previouSchedule.getScheduleTime()
-        self.priviousScheduleDay = previouSchedule.getScheduleDay()
+        self.schedule = schedule
+        self.scheduleTime = schedule.getScheduleTime()
+        self.scheduleDay = schedule.getScheduleDay()
 
-    def updateSchedule(self, doctors, maes, previousSched, scheduleTime, scheduleDay): #  nextTime falta meter isto
+
+    def updateSchedule(self):
         """
         Update birth assistance schedule assigning the given birth assistance requested
         to the given doctors, taking into account a previous schedule.

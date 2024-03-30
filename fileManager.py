@@ -1,17 +1,18 @@
 import doctor as doctor
 import mae as mae
 import dateTime as dateTime
-class fileManager ():
-    def __init__(self):
-        self
+class FileManager ():
+    def __init__(self, fileName):
+        self.fileName = fileName
+        self.fileContents = []
 
 
 
 
 
-class reader(fileManager):
-    def __init__(self):
-       self  
+class Reader(FileManager):
+    def __init__(self, fileName):
+       super(fileName)
 
 
     def removeHeader(filename):
@@ -59,49 +60,45 @@ class reader(fileManager):
         
 
         return r, scheduleTime, scheduleDay
+  
         
-
-        
-        
-        
-class doctorReader(reader):
+class DoctorsReader(Reader):
     def __init__(self, fileName):
+        super(fileName)
         (inFile) = super.removeHeader(fileName)
-        doctors = []
+        self.doctorsList = []
         for line in inFile:
             line = line.strip()
-            nome, experiencia, ultimoParto, minAcomulados, ultimoDescanso = line.split(" ")
-            doctors.append(doctor(nome, int(experiencia), str(ultimoParto), int(minAcomulados), str(ultimoDescanso)))
+            (nome, experiencia, ultimoParto, minAcomulados, ultimoDescanso) = line.split(" ")
+            self.doctorsList.append(doctor(nome, int(experiencia), str(ultimoParto), int(minAcomulados), str(ultimoDescanso)))
         
-        return doctors
        
 
-class maeReader(reader):
+class MothersReader(Reader):
     def __init__(self, fileName):
-        maes = []
+        super(fileName)        
+        self.mothersList = []
         (inFile) = super.removeHeader(fileName)
         for line in inFile:
             line = line.strip()
-            nome, idade, pulseira, risco = line.split(" ")
-            maes.append(mae(nome, int(idade), str(pulseira), str(risco)))
-        return maes
+            (nome, idade, pulseira, risco) = line.split(" ")
+            self.mothersList.append(mae(nome, int(idade), str(pulseira), str(risco)))
 
-class scheduleReader(reader):
+class ScheduleReader(Reader):
     def __init__(self, fileName):
-
-        schedule = []
+        super(fileName)
+        self.schedules = []
         (inFile) = super.removeHeader(fileName)
         for line in inFile:
             line = line.strip()
-            nome, idade, pulseira, risco = line.split(" ")
-            schedule.append(mae(nome, int(idade), str(pulseira), str(risco)))
-        return schedule
+            (nome, idade, pulseira, risco) = line.split(" ")
+            self.schedules.append(mae(nome, int(idade), str(pulseira), str(risco)))
 
 
 
-class writer(fileManager):
-    def __init__(self):
-        self
+class Writer(FileManager):
+    def __init__(self, fileName):
+        super(fileName)
 
 
     def computeNewFileNames (scheduleTime, scheduleDay):
@@ -146,25 +143,11 @@ class writer(fileManager):
 
         return header
     
-class doctorWriter(writer):
-    def __init__(self, doctors, scheduleDay, scheduleTime):
-        newDoctorsFileName = super.computeNewFileNames(scheduleTime, scheduleDay)[1]
-        header = super.saveHeader(newDoctorsFileName, scheduleDay, scheduleTime)
-        with open(newDoctorsFileName, "w") as file:
-            for line in header:
-                file.write(line)
-            for doctor in doctors:
-                file.write(str(doctor) + "\n")
-        return newDoctorsFileName
+class DoctorWriter(Writer):
+    def __init__(self, fileName):
+        super(fileName)
 
-class scheduleWriter(writer):
-    def __init__(self, schedule, scheduleDay, scheduleTime):
-        newScheduleFileName = super.computeNewFileNames(scheduleTime, scheduleDay)[0]
-        header = super.saveHeader(newScheduleFileName, scheduleDay, scheduleTime)
-        with open(newScheduleFileName, "w") as file:
-            for line in header:
-                file.write(line)
-            for mae in schedule:
-                file.write(str(mae) + "\n")
-        return newScheduleFileName
+class ScheduleWriter(Writer):
+    def __init__(self, fileName):
+        super(fileName)
     
