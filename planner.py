@@ -4,122 +4,6 @@ import schedule as s
 import fileManager as fM
 import datetime as dT
 
-class Matcher:
-    def __init__(self, doctors, maes):
-        self.doctors = doctors
-        self.maes = maes
-
-    # def sendRequestToOtherHospital(request, newSchedule, scheduleTime):
-    #     """
-    #     Writes a request in the newSchedule with the message "redirected to other network" which signals that the request was sent to another hospital either because there are no doctors available 
-    #     or because there are no doctors with the required skill level or even if the doctor does not have available time to perform the request.
-
-    #     Requires:
-    #     request that should be sent to another hospital, the schedule to which append the request to and the time of the schedule
-    #     """	
-    #     newSchedule.append((scheduleTime, request[const.REQ_NAME_IDX], "redirected to other network"))
-
-
-    def getMatchingDoctor (mae, doctors):
-        """
-        Calculates the doctors that have the required skill and availability to perform the request given
-
-        Requires:
-        The request to be performed and the list of all doctors
-
-        Ensures:
-        A doctor that has the required skill and availability to perform the request given. The doctors are sorted by priority which means that when more than one doctor is available 
-        to perform the request the doctor with the highest priority is returned. Priority is given by the lowest accumulated hours in the day, the lowest accumulated hours in the week,
-        """	
-        listOfMatchingDoctors = []
-        for doctor in doctors:
-            # A doctor is NOT availbale to do the request if:
-            #    he is already fully booked for the day
-            #    doctor has not enough hours free to do the request
-            if( d.isDoctorSkillHigherOrEqual(doctor, mae) ):
-                # If the doctor is available to do the request, check if he has the right skill
-                # That is we need to check that the skill of the available doctor is equal or higher than the request
-                if d.isDoctorAvailable(doctor):
-                    listOfMatchingDoctors.append(doctor)
-                #sort the doctors most qualifeid first in the list
-        if len(listOfMatchingDoctors) == 0:
-            return None
-        else:
-            prioritezeDoctors(listOfMatchingDoctors)
-            return listOfMatchingDoctors[0]
-
-
-
-
-
-	
-
-
-class doctorPlanner:
-    def __init__(self, doctors):
-        self.sortedDoctors = self.sortDoctors(doctors)
-
-
-    def sortDoctors(doctors):
-        """
-        Sorts doctors by skill
-        Requires:
-        The list of doctorts to sort
-        Ensures:
-        The doctors given as input to be, sorted by skill
-        """
-        # Sort doctors by priority then by name
-        doctors.sort(key=lambda x: (-int(x[1])))
-
-    def custom_sort_key(arr):
-        """
-        Function to be used to sort doctors by priority
-        """
-        type = int(arr[const.DOCT_TYPE_IDX])
-        accumHours = int(arr[const.DOCT_ACCUM_HOURS_DAY_IDX])
-        accumTimeWeek = arr[const.DOCT_ACCUM_TIME_WEEK_IDX]
-        
-        match = re.match(r'(\d{2})h(\d{2})', accumTimeWeek)
-        if match:
-            hours, minutes = map(int, match.groups())
-        else:
-            hours, minutes = 0, 0
-        
-        return (-type, accumHours, hours, minutes)
-
-        
-    def color(color):
-        """
-        Converts a color to an integerr to be used in sorting
-        """
-        if color == 'red':
-            return 3
-        elif color == 'yellow':
-            return 2
-        elif color == 'green':
-            return 1
-        else:
-            return 10
-
-
-class maePlanner:
-    def __init__(self, maes):
-        self.maes = maes
-        self.sortedMaes = self.sortMaes(maes)
-
-
-    def sortMaes(self):
-        """
-        Sorts requests by priority, bracelet color, age and Name of the mother 
-        Requires:
-        The requests to be sorted
-        
-        Ensures:
-        The requests given as input to be, sorted by priority
-        """
-        # Sort requests by priority then by color (red, them yellow then green), then by age descending then by name
-        
-        self.sort(key=lambda x: (x[3], -super.color(x[2]), -int(x[1]), x[0]))
     
 
 class schedulePlanner:
@@ -168,7 +52,19 @@ class schedulePlanner:
         return newSchedule
     
     
-    
+    def computeNewFileNames (self, scheduleTime, scheduleDay):
+        """
+        Computes the new file names for the schedule and doctors files. File names hour is increased by 30 minutes.
+        Requires:
+        scheduleTime is a string in the format HHhMM with the time of the current schedule
+        scheduleDay is a string in the format DD-MM-YYYY with the day of the current schedule
+        """
+        (newScheduleTime, newScheduleDay) = dT.computeNewTimes(scheduleTime, scheduleDay)
+        
+        newScheduleFileName = "schedule" + newScheduleTime + ".txt"
+        newDoctorsFileName = "doctors" + newScheduleTime + ".txt"
+
+        return (newScheduleFileName, newDoctorsFileName)
     
     
     def createNewScheduleBasedOnPrevious(self, previousSched, scheduleTime, scheduleDay):
@@ -228,4 +124,71 @@ class schedulePlanner:
         newSchedule.append((scheduleTime, mae.getName(), "redirected to other network"))
 
 
+
+
+    def getMatchingDoctor (self, mae, doctors):
+        """
+        Calculates the doctors that have the required skill and availability to perform the request given
+
+        Requires:
+        The request to be performed and the list of all doctors
+
+        Ensures:
+        A doctor that has the required skill and availability to perform the request given. The doctors are sorted by priority which means that when more than one doctor is available 
+        to perform the request the doctor with the highest priority is returned. Priority is given by the lowest accumulated hours in the day, the lowest accumulated hours in the week,
+        """	
+        listOfMatchingDoctors = []
+        for doctor in doctors:
+            # A doctor is NOT availbale to do the request if:
+            #    he is already fully booked for the day
+            #    doctor has not enough hours free to do the request
+            if( d.isDoctorSkillHigherOrEqual(doctor, mae) ):
+                # If the doctor is available to do the request, check if he has the right skill
+                # That is we need to check that the skill of the available doctor is equal or higher than the request
+                if d.isDoctorAvailable(doctor):
+                    listOfMatchingDoctors.append(doctor)
+                #sort the doctors most qualifeid first in the list
+        if len(listOfMatchingDoctors) == 0:
+            return None
+        else:
+            self.prioritezeDoctors(listOfMatchingDoctors)
+            return listOfMatchingDoctors[0]
+        
+    def custom_sort_key(self, arr):
+        """
+        Function to be used to sort doctors by priority
+        """
+        type = int(arr[const.DOCT_TYPE_IDX])
+        accumHours = int(arr[const.DOCT_ACCUM_HOURS_DAY_IDX])
+        accumTimeWeek = arr[const.DOCT_ACCUM_TIME_WEEK_IDX]
+        
+        match = re.match(r'(\d{2})h(\d{2})', accumTimeWeek)
+        if match:
+            hours, minutes = map(int, match.groups())
+        else:
+            hours, minutes = 0, 0
+        
+        return (-type, accumHours, hours, minutes)
+
+        
+    def color(self, color):
+        """
+        Converts a color to an integerr to be used in sorting
+        """
+        if color == 'red':
+            return 3
+        elif color == 'yellow':
+            return 2
+        elif color == 'green':
+            return 1
+        else:
+            return 10
+
+    def prioritezeDoctors(self, listOfMatchingDoctors):
+	    listOfMatchingDoctors.sort(key=self.custom_sort_key)
+
+    def getDoctors(self):
+        return self.doctors
     
+    def getSchedule(self):
+        return self.
