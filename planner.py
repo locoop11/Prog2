@@ -7,14 +7,14 @@ import datetime as dT
     
 # A comment
 class schedulePlanner:
-    def __init__(self, doctors, maes, previouSchedule):
+    def __init__(self, doctors, maes, schedule):
         self.doctors = doctors
         self.maes = maes
-        self.previousSched = previouSchedule
-        self.previousScheduleTime = previouSchedule.getScheduleTime()
-        self.priviousScheduleDay = previouSchedule.getScheduleDay()
+        self.schedule = schedule
+        self.scheduleTime = schedule.getScheduleTime()
+        self.scheduleDay = schedule.getScheduleDay()
 
-    def updateSchedule(self, doctors, maes, previousSched, scheduleTime, scheduleDay): #  nextTime falta meter isto
+    def updateSchedule(self): #  nextTime falta meter isto
         """
         Update birth assistance schedule assigning the given birth assistance requested
         to the given doctors, taking into account a previous schedule.
@@ -34,19 +34,19 @@ class schedulePlanner:
 
 
         # 1. Sort request by priority and doctors by skill
-        newSchedule = self.createNewScheduleBasedOnPrevious(previousSched, scheduleTime, scheduleDay)
-        (newScheduleTime, newScheduleDay) = fM.computeNewTimes(scheduleTime, scheduleDay)
+        newSchedule = self.createNewScheduleBasedOnPrevious(self.schedule, self.scheduleTime, self.scheduleDay)
+        (newScheduleTime, newScheduleDay) = fM.computeNewTimes(self.scheduleTime, self.scheduleDay)
 
     
 
-        for mae in maes:
-            doctor  = self.getMatchingDoctor(mae, doctors) # get the doctor that is the best to do the request
+        for mae in self.maes:
+            doctor  = self.getMatchingDoctor(mae, self.doctors) # get the doctor that is the best to do the request
             
             if( doctor != None):
                 self.addDoctorToNewSchedule(doctor, mae, newSchedule, newScheduleTime, newScheduleDay) # Updates doctor and the new schedule 
             else:
                 # If a suitable doctor is not found, send request to another hospital
-                self.sendRequestToOtherHospital(mae, newSchedule, scheduleTime)
+                self.sendRequestToOtherHospital(mae, newSchedule, self.scheduleTime)
 
         return newSchedule
     
@@ -184,10 +184,10 @@ class schedulePlanner:
             return 10
 
     def prioritezeDoctors(self, listOfMatchingDoctors):
-	    listOfMatchingDoctors.sort(key=self.custom_sort_key)
+        listOfMatchingDoctors.sort(key=self.custom_sort_key)
 
     def getDoctors(self):
         return self.doctors
     
     def getSchedule(self):
-        return self.
+        return self.schedule
