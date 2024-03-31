@@ -28,8 +28,8 @@ class Doctor:
         Ensures:
         To return a boolean value True if the doctor has the required skill and False otherwise
         """
-        if  mother.getRisk() == 'high' :
-            if self.experienciaxperiencia == '2' or self.experiencia() == '3':
+        if  mother.getRisco() == 'high' :
+            if self.experiencia == '2' or self.experiencia() == '3':
                 return True
             else:
                 return False
