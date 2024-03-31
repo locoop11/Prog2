@@ -11,6 +11,21 @@ class runner (object):
         self.maeFileName = mothersFileName
         self.scheduleFileName = scheduleFileName
 
+    def computeNewFileNames (self, scheduleTime, scheduleDay):
+        """
+        Computes the new file names for the schedule and doctors files. File names hour is increased by 30 minutes.
+        Requires:
+        scheduleTime is a string in the format HHhMM with the time of the current schedule
+        scheduleDay is a string in the format DD-MM-YYYY with the day of the current schedule
+        """
+        (newScheduleTime, newScheduleDay) = dT.computeNewTimes(scheduleTime, scheduleDay)
+        
+        newScheduleFileName = "schedule" + newScheduleTime + ".txt"
+        newDoctorsFileName = "doctors" + newScheduleTime + ".txt"
+
+        return (newScheduleFileName, newDoctorsFileName)
+    
+    
 
     def run(self):
         doctorsHandler = DoctorsHandler(self.doctorFileName)

@@ -1,8 +1,9 @@
-import doctor as d
-import mae as m
+import Doctor as d
+import Mother as m
 import schedule as s
 import fileManager as fM
 import datetime as dT
+import re
 
     
 # A comment
@@ -49,21 +50,6 @@ class schedulePlanner:
                 self.sendRequestToOtherHospital(mae, newSchedule, self.scheduleTime)
 
         return newSchedule
-    
-    
-    def computeNewFileNames (self, scheduleTime, scheduleDay):
-        """
-        Computes the new file names for the schedule and doctors files. File names hour is increased by 30 minutes.
-        Requires:
-        scheduleTime is a string in the format HHhMM with the time of the current schedule
-        scheduleDay is a string in the format DD-MM-YYYY with the day of the current schedule
-        """
-        (newScheduleTime, newScheduleDay) = dT.computeNewTimes(scheduleTime, scheduleDay)
-        
-        newScheduleFileName = "schedule" + newScheduleTime + ".txt"
-        newDoctorsFileName = "doctors" + newScheduleTime + ".txt"
-
-        return (newScheduleFileName, newDoctorsFileName)
     
     
     def createNewScheduleBasedOnPrevious(self, previousSched, scheduleTime, scheduleDay):
@@ -157,9 +143,9 @@ class schedulePlanner:
         """
         Function to be used to sort doctors by priority
         """
-        type = int(arr[const.DOCT_TYPE_IDX])
-        accumHours = int(arr[const.DOCT_ACCUM_HOURS_DAY_IDX])
-        accumTimeWeek = arr[const.DOCT_ACCUM_TIME_WEEK_IDX]
+        type = int(arr.getExperiencia())
+        accumHours = int(arr.getMinAcomulados)
+        accumTimeWeek = arr.getUltimoDescanso
         
         match = re.match(r'(\d{2})h(\d{2})', accumTimeWeek)
         if match:
@@ -170,19 +156,6 @@ class schedulePlanner:
         return (-type, accumHours, hours, minutes)
 
         
-    def color(self, color):
-        """
-        Converts a color to an integerr to be used in sorting
-        """
-        if color == 'red':
-            return 3
-        elif color == 'yellow':
-            return 2
-        elif color == 'green':
-            return 1
-        else:
-            return 10
-
     def prioritezeDoctors(self, listOfMatchingDoctors):
         listOfMatchingDoctors.sort(key=self.custom_sort_key)
 
