@@ -1,16 +1,16 @@
-class schedule(object):
-    def __init__(self, time, day, mae, doctor):
+class Schedule(object):
+    def __init__(self, time, mae, doctor):
         self.time = time
         self.mae = mae
         self.doctor = doctor
-        self.day = day
+        self.time = time
         
 
 
     
 
     def __str__(self):
-        return self.hora + " " + str(self.mae) + " " + str(self.doctor)
+        return self.time + ", " + str(self.mae) + ", " + str(self.doctor)
     
     def getScheduleTime(self):
         return self.time
@@ -18,5 +18,3 @@ class schedule(object):
         return self.mae
     def getDoctor(self):
         return self.doctor
-    def getScheduleDay(self):
-        return self.day

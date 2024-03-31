@@ -1,5 +1,5 @@
 
-class mae ():
+class Mother ():
 
     def __init__ (self, nome, idade, pulseira, risco):
         self.nome = nome
@@ -9,7 +9,7 @@ class mae ():
 
 
     def __str__ (self):
-        return self.nome + " " + str(self.idade) + " " + str(self.pulseira) + " " + str(self.risco)
+        return self.nome + ", " + str(self.idade) + ", " + str(self.pulseira) + ", " + str(self.risco)
     
     
 

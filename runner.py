@@ -13,23 +13,17 @@ class runner (object):
 
 
     def run(self):
-        doctorsReader = DoctorsReader(self.doctorFileName)
-        mothersReader = MothersReader(self.maeFileName)
-        scheduleReader = ScheduleReader(self.scheduleFileName)
+        doctorsHandler = DoctorsHandler(self.doctorFileName)
+        mothersHandler = RequestsHandler(self.maeFileName)
+        scheduleHandler = ScheduleHandler(self.scheduleFileName)
 
-        doctorsList = doctorsReader.getDoctorsList()
-        mothersListByPriority = mothersReader.getMotherListByPriority()
-        schedule = scheduleReader.getSchedule()
-        
-        planner = schedulePlanner(doctorsList, mothersListByPriority, schedule)
-        doctors = planner.getDoctors()
+        planner = schedulePlanner(doctorsHandler.loadAllDoctors(), 
+                                  RequestsHandler.loadAllRequestsOrderedByPriority(), 
+                                  scheduleHandler.loadAllSchedules())
         planner.updateSchedule()
         updatedDoctors = planner.getDoctors()
         newSchedule = planner.getSchedule()
 
-        doctorsWriter = DoctorWriter(self.doctorFileName)
-        mothersWriter = mothersWriter(self.maeFileName)
-        scheduleWriter = scheduleWriter(self.scheduleFileName)
 
 
 

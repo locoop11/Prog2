@@ -1,7 +1,6 @@
-from mae import mae
 import dateTime as dT
 
-class doctor:
+class Doctor:
     def __init__(self, nome, experiencia, ultimoParto, minAcomulados, ultimoDescanso):
         self.nome = nome
         self.experiencia = experiencia
@@ -21,7 +20,7 @@ class doctor:
                 return False
         return True
 
-    def isDoctorSkillHigherOrEqual(self, mae):
+    def isDoctorSkillHigherOrEqual(self, mother):
         """
         Checks if a doctor skill is enough for a given request
         Requires: 
@@ -29,8 +28,8 @@ class doctor:
         Ensures:
         To return a boolean value True if the doctor has the required skill and False otherwise
         """
-        if mae.getRisco() == 'high':
-            if self.getExperiencia == '2' or self.getExperiencia == '3':
+        if  mother.getRisk() == 'high' :
+            if self.experienciaxperiencia == '2' or self.experiencia() == '3':
                 return True
             else:
                 return False
@@ -38,7 +37,7 @@ class doctor:
 
 
     def __str__(self):
-        return self.nome + " " + str(self.experiencia) + " " + str(self.ultimoParto) + " " + str(self.minAcomulados) + " " + str(self.ultimoDescanso)
+        return self.nome + ", " + str(self.experiencia) + ", " + str(self.ultimoParto) + ", " + str(self.minAcomulados) + ", " + str(self.ultimoDescanso)
     
 
 
