@@ -177,7 +177,7 @@ class RequestsHandler(FileManager):
         
         # Sort mothers by priority then by color (red, yellow, green), then by age descending then by name
         #self._mothers.sort(key=lambda x: (x[3], -self.__color(x[2]), -int(x[1]), x[0]))
-        self._mothers.sort(key=lambda x: (x.getRisco(), -self.__color(x.getPulseira()), -int(x.getIdade()), x.getNome()))
+        self._mothers.sort(key=lambda x: (-self.__color(x.getPulseira()), -int(x.getIdade()), x.getNome()))
         return self._mothers
 
     def __color(self, color):

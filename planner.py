@@ -144,6 +144,8 @@ class schedulePlanner:
         Function to be used to sort doctors by priority
         """
         type = int(arr.getExperiencia())
+        timeLastIntervention = int(arr.getUltimoParto().split("h")[0]) + int(arr.getUltimoParto().split("h")[1])
+        print(timeLastIntervention + ", " + arr.getUltimoParto())
         accumHours = 999999
         if( arr.getMinAcomulados() != "weekly leave"):
             accumHours = int(arr.getMinAcomulados())
@@ -155,7 +157,7 @@ class schedulePlanner:
         else:
             hours, minutes = 0, 0
         
-        return (accumHours, hours, minutes)
+        return (timeLastIntervention, -type, accumHours, hours, minutes)
 
         
     def prioritezeDoctors(self, listOfMatchingDoctors):
