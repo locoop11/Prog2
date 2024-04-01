@@ -227,6 +227,9 @@ class ScheduleHandler(FileManager):
         self._scheduleItems = initialSchedule
 
     def writeSchedule(self):
+        # Sort scheduleItems by time
+        self._scheduleItems.sort(key=lambda x: x.getTime())
+        
         for schedule in self._scheduleItems:
             self._fileContents.append(str(schedule))
         super().writeData()
