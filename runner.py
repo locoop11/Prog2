@@ -1,6 +1,6 @@
 import mae as m
 import doctor as d
-import schedule as s
+import ScheduleItem as s
 from fileManager import  *
 from planner import  * 
 import dateTime as dT

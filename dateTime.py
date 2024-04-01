@@ -80,7 +80,7 @@ def addHoursToDateTime(dateTime, hours):
     """
     time = dateTime.split("|")[1]
     date = dateTime.split("|")[0]
-    newHour = self.hourToInt(time) + hours
+    newHour = hourToInt(time) + hours
     
     returnDate = ""
     # Compute current run date and time (which is 30 minutes after last run date unless it's a new day)
@@ -90,7 +90,7 @@ def addHoursToDateTime(dateTime, hours):
         returnDate = newTime.strftime("%d:%m:%Y") + "|" + const.START_OF_DAY_STRING_TIME
     else:
         # We are still in the same day
-        returnDate = date + "|" + self.intToTime(newHour, self.minutesToInt(time))
+        returnDate = date + "|" + intToTime(newHour, minutesToInt(time))
     
     return returnDate
 
@@ -139,7 +139,7 @@ def updateHours(time):
     if min>=60:
         h=h+1
         min=min-60
-    finalTime = self.intToTime(h, min)
+    finalTime = intToTime(h, min)
     return finalTime
 
 def updateDay(day):

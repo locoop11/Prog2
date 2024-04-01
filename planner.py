@@ -1,19 +1,20 @@
 import Doctor as d
 import Mother as m
-import schedule as s
+import ScheduleItem as s
 import fileManager as fM
 import datetime as dT
 import re
+from fileManager import  *
 
     
 # A comment
 class schedulePlanner:
-    def __init__(self, doctors, maes, schedule):
+    def __init__(self, doctors, maes, scheduleHandler):
         self.doctors = doctors
         self.maes = maes
-        self.schedule = schedule
-        self.scheduleTime = schedule.getScheduleTime()
-        self.scheduleDay = schedule.getScheduleDay()
+        self.schedule = scheduleHandler
+        self.scheduleTime = scheduleHandler._headerTime
+        self.scheduleDay = scheduleHandler._headerDay
 
     def updateSchedule(self): #  nextTime falta meter isto
         """
@@ -36,7 +37,8 @@ class schedulePlanner:
 
         # 1. Sort request by priority and doctors by skill
         newSchedule = self.createNewScheduleBasedOnPrevious(self.schedule, self.scheduleTime, self.scheduleDay)
-        (newScheduleTime, newScheduleDay) = fM.computeNewTimes(self.scheduleTime, self.scheduleDay)
+        (newScheduleTime, newScheduleDay) = dT.computeNewTimes(self.scheduleTime, self.scheduleDay)
+        newScheduleHandler = ScheduleHandler(newSchedule, newScheduleDay, newScheduleTime)
 
     
 
@@ -44,7 +46,7 @@ class schedulePlanner:
             doctor  = self.getMatchingDoctor(mae, self.doctors) # get the doctor that is the best to do the request
             
             if( doctor != None):
-                self.addDoctorToNewSchedule(doctor, mae, newSchedule, newScheduleTime, newScheduleDay) # Updates doctor and the new schedule 
+                self.addToNewSchedule(doctor, mae, newScheduleHandler) # Updates doctor and the new schedule 
             else:
                 # If a suitable doctor is not found, send request to another hospital
                 self.sendRequestToOtherHospital(mae, newSchedule, self.scheduleTime)
@@ -76,7 +78,7 @@ class schedulePlanner:
 
         return newSchedule
     
-    def addDoctorToNewSchedule(self, doctor, request, newSchedule, scheduleTime, scheduleDay):
+    def addToNewSchedule(self, doctor, mae, newScheduleHandler):
         """
         this funcion adds the doctor and the request in the newSchedule, and updates the doctor carcateristics
         Requires:
@@ -85,15 +87,15 @@ class schedulePlanner:
         Ensures:
         The doctor is added to the schedule and the doctor characteristics are updated.
         """
-        scheduleDoctorName = doctor.getNome()
-        scheduleMaeName = request.getNome()
-        doctorScheduleTime = dT.biggestDate(scheduleDay +"|"+scheduleTime.replace("h", ":"), scheduleDay +"|"+doctor.getNome().replace("h", ":"))
+        doctorScheduleTime = dT.biggestDate(newScheduleHandler.getScheduleDay() +"|"+newScheduleHandler.getScheduleTime().replace("h", ":"), newScheduleHandler.getScheduleDay() +"|"+doctor.getUltimoParto().replace("h", ":"))
         doctorScheduleTime = doctorScheduleTime.split("|")[1].replace(":", "h")
-        if( doctorScheduleTime[:2] == "20" and scheduleTime[:2] == "04"):
-            doctorScheduleTime = scheduleTime
+        if( doctorScheduleTime[:2] == "20" and newScheduleHandler.getScheduleTime()[:2] == "04"):
+            newScheduleHandler.addSchedule(ScheduleItem(newScheduleHandler.getScheduleTime(), mae.getNome(), doctor.getNome()))
         else:
             if( doctorScheduleTime[:2] == "20"):
-                return self.sendRequestToOtherHospital(request, newSchedule, scheduleTime)
+                return newScheduleHandler.addSchedule(ScheduleItem(doctorScheduleTime, mae.getNome(), "redirected to other network"))
+        
+        doctor.updateDoctor(doctorScheduleTime)
             
     
 
@@ -127,10 +129,10 @@ class schedulePlanner:
             # A doctor is NOT availbale to do the request if:
             #    he is already fully booked for the day
             #    doctor has not enough hours free to do the request
-            if( d.isDoctorSkillHigherOrEqual(doctor, mae) ):
+            if( doctor.isDoctorSkillHigherOrEqual(mae) ):
                 # If the doctor is available to do the request, check if he has the right skill
                 # That is we need to check that the skill of the available doctor is equal or higher than the request
-                if d.isDoctorAvailable(doctor):
+                if doctor.isAvailable():
                     listOfMatchingDoctors.append(doctor)
                 #sort the doctors most qualifeid first in the list
         if len(listOfMatchingDoctors) == 0:
@@ -144,8 +146,10 @@ class schedulePlanner:
         Function to be used to sort doctors by priority
         """
         type = int(arr.getExperiencia())
-        accumHours = int(arr.getMinAcomulados)
-        accumTimeWeek = arr.getUltimoDescanso
+        accumHours = 999999
+        if( arr.getMinAcomulados() != "weekly leave"):
+            accumHours = int(arr.getMinAcomulados())
+        accumTimeWeek = arr.getWeeklyWorkedHours()
         
         match = re.match(r'(\d{2})h(\d{2})', accumTimeWeek)
         if match:
@@ -158,6 +162,7 @@ class schedulePlanner:
         
     def prioritezeDoctors(self, listOfMatchingDoctors):
         listOfMatchingDoctors.sort(key=self.custom_sort_key)
+        return listOfMatchingDoctors
 
     def getDoctors(self):
         return self.doctors

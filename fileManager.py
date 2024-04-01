@@ -1,7 +1,7 @@
 
 from Doctor import Doctor as Doctor
 from Mother import Mother as Mother
-from schedule import Schedule as Schedule
+from ScheduleItem import ScheduleItem as ScheduleItem
 import dateTime as dateTime
 
 
@@ -176,24 +176,41 @@ class RequestsHandler(FileManager):
 class ScheduleHandler(FileManager):
     def __init__(self, fileName):
         super().__init__(fileName)
-        self._schedules = []
+        self._scheduleItems = []
+    def __init__(self, initialSchedule, scheduleDay, scheduleTime):
+        self._scheduleItems = initialSchedule
+        self._fileTime = scheduleTime
+        self._headerTime = scheduleTime
+        self._headerDay = scheduleDay
+    
+    def getScheduleTime(self):
+        return self._headerTime
+    
+    def getSchedukleDay(self):
+        return self._headerDay
+    
+    def addScheduleItem(self, scheduleItem):
+        self._scheduleItems.append(scheduleItem)
+
+    def saveSchedule():
+        pass
 
     def loadAllSchedules(self):
         self._fileContents = []
-        self._schedules = []
+        self._scheduleItems = []
         self.loadData()
         self.removeHeader()
         for line in self._fileContents:
             line = line.strip()
             (time, motherName, doctorName) = line.split(", ")
-            schedule = Schedule(time, motherName, doctorName)
-            self._schedules.append(schedule)
-        return self._schedules
+            scheduleItem = ScheduleItem(time, motherName, doctorName)
+            self._scheduleItems.append(scheduleItem)
+        return self._scheduleItems
 
     def __str__(self) -> str:
         result = ""
-        for schedule in self._schedules :
-            result += str(schedule).strip() + "\n"
+        for scheduleItem in self._scheduleItems :
+            result += str(scheduleItem).strip() + "\n"
         return result
 
 

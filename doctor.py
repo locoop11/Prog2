@@ -1,22 +1,23 @@
 import dateTime as dT
 
 class Doctor:
-    def __init__(self, nome, experiencia, ultimoParto, minAcomulados, ultimoDescanso):
+    def __init__(self, nome, experiencia, ultimoParto, minAcomulados, weeklyWorkedHours):
         self.nome = nome
         self.experiencia = experiencia
         self.ultimoParto = ultimoParto
         self.minAcomulados = minAcomulados
-        self.ultimoDescanso = ultimoDescanso
+        self.weeklyWorkedHours = weeklyWorkedHours
 
-    def isDoctorAvailable(self):
+    def isAvailable(self):
         """
         Checks thast a doctor is available to perform a request, ie is not in weekly leave and has enough hours to perform the request
         Requires:
         The doctor to check if is available
         Ensures to return a boolean value True if the doctor is available and False otherwise
         """
-        if self.getMinAcomulados != "weekly leave" :
-            if dT.updateHours(self.getMinAcomulados == "4"):
+        if self.getMinAcomulados() != "weekly leave" :
+            hoursUpdated = dT.updateHours(self.getWeeklyWorkedHours())
+            if hoursUpdated[0] == "4":
                 return False
         return True
 
@@ -29,7 +30,7 @@ class Doctor:
         To return a boolean value True if the doctor has the required skill and False otherwise
         """
         if  mother.getRisco() == 'high' :
-            if self.experiencia == '2' or self.experiencia() == '3':
+            if self.experiencia == '2' or self.experiencia == '3':
                 return True
             else:
                 return False
@@ -42,7 +43,17 @@ class Doctor:
 
 
 
-
+    def updateDoctor(self, newScheduleTime): 
+        """
+        Updates the doctor schedule with the new time
+        Requires:
+        The new time to be updated
+        Ensures:
+        The doctor schedule is updated with the new time
+        """
+        self.ultimoParto = newScheduleTime
+        self.minAcomulados = str(int(self.minAcomulados) + 30)
+        self.weeklyWorkedHours = dT.updateHours(self.weeklyWorkedHours)
 
 
 
@@ -55,7 +66,7 @@ class Doctor:
         return self.ultimoParto 
     def getMinAcomulados(self):
         return self.minAcomulados 
-    def getUltimoDescanso(self):
-        return self.ultimoDescanso
+    def getWeeklyWorkedHours(self):
+        return self.weeklyWorkedHours
     
         
