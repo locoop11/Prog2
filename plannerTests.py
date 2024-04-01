@@ -14,6 +14,40 @@ class TestPlanner :
         self.testGetMatchingDoctorsWeeklyLeave()
         self.testGetMatchingDoctorsWeeklyHoursExceeded()
         self.testGetMatchingDoctorsMartchMinAccumMins()
+        self.testaddToNewSchedule()
+        self.testsendRequestToOtherHospital()
+
+    def testsendRequestToOtherHospital(self) :
+        scheduleH = ScheduleHandler("./testSets_v1/testSet1/schedule10h00.txt")
+        scheduleH.loadAllSchedules()
+        planner = schedulePlanner([], [], scheduleH)
+        oldScheduleSize = len(scheduleH._scheduleItems)
+        mother = Mother('Isabel Sofia', 30, 'red', 'low')
+        planner.sendRequestToOtherHospital(mother, scheduleH, '11h00')
+        newScheduleSize = len(scheduleH._scheduleItems)
+        assert newScheduleSize == oldScheduleSize +1, "The schedule should have increased by 1"
+        assert str(scheduleH._scheduleItems[3]) == '11h00, Isabel Sofia, redirected to other network', "The last item in the schedule should be Isabel Sofia, redirected to other network"
+
+
+
+    def testaddToNewSchedule(self) :
+        carlotaCunha = Mother('Carlota Cunha', 30, 'red', 'low') #Carlota Cunha, 30, red, low
+        abilioAmaral = Doctor('Abílio Amaral', 1, '11h05', 180, '28h00') #Abílio Amaral, 1, 11h05, 180, 28h00
+        scheduleH = ScheduleHandler("./testSets_v1/testSet1/schedule10h00.txt")
+        scheduleH.loadAllSchedules()
+        numItemsBefore = len(scheduleH._scheduleItems)
+        
+
+        planner = schedulePlanner([], [], scheduleH)
+        planner.addToNewSchedule(abilioAmaral, carlotaCunha, scheduleH)
+        numItemsAfter = len(scheduleH._scheduleItems)
+        assert numItemsAfter == numItemsBefore + 1, "The number of items in the schedule should have increased by 1"
+        assert abilioAmaral.getUltimoParto() == '11h35', "The doctor's last birth should have been updated to 11h35"
+        message = "The doctor's accumulated minutes should have been updated to 210, but is " + str(abilioAmaral.getMinAcomulados())
+        assert abilioAmaral.getMinAcomulados() == '210', message
+        message = "The doctor's worked hours since last break should have been updated to 28h30, but is " + abilioAmaral.getWeeklyWorkedHours()
+        assert abilioAmaral.getWeeklyWorkedHours() == '28h30', message
+
 
 
     def testCreatePlannerWithEmptySchedule(self) :

@@ -1,4 +1,5 @@
 from fileManager import * 
+import os
 class testReaders :
     def __init__(self) :
         pass
@@ -13,8 +14,21 @@ class testReaders :
         self.testFileWithWrongDate()
         self.testReadNonExistingFile()
         self.testFileWithWrongDate2()
+        self.testWriteDoctors()
+        self.testGetScheduleArray()
         #testReaders.testMothersReader()
         #testReaders.testScheduleReader()
+
+    def testGetScheduleArray(self):
+        try:
+            scheduleHandler = ScheduleHandler("./testSets_v1/testSet1/schedule10h00.txt")
+            scheduleHandler.loadAllSchedules()
+            arr = scheduleHandler.getScheduleArray()
+            assert len(arr) == 3, "testGetScheduleArray: The array should have 3 elements, but has " + str(len(arr))
+            assert arr[0][2] == "Bernardo Biscaia", "testGetScheduleArray: The first element should be Bernardo Biscaia, but is " + arr[0][2]
+        except AssertionError as error:
+            print(f"testGetScheduleArray: Failed. {error}")
+        print("testGetScheduleArray: passed.")
 
     def testRequestsByPriority(self):
         try:
@@ -124,8 +138,24 @@ class testReaders :
             return True
         except AssertionError as error:
             print(f"testReadNonExistingFile: failed. {error}")
-        
 
+    def testWriteDoctors(self):
+        try :
+            expectedFileName = "doctors10h30.txt"
+            doctorsHandler = DoctorsHandler("./testSets_v1/testSet1/doctors10h00.txt")
+            doctorsHandler.loadAllDoctors()[2].updateDoctor("11h00")
+            docsHandler2 = DoctorsHandler("", doctorsHandler._doctors, doctorsHandler._headerDay, doctorsHandler._headerTime)   
+            docsHandler2.writeDoctors()
+            
+            doctorsHandler1 = DoctorsHandler(expectedFileName)
+            doctorsHandler1.loadAllDoctors()
+            assert doctorsHandler1.loadAllDoctors()[2].getUltimoParto() == "11h30", "testWriteDoctors: The doctors were not written correctly. Expected 11h30, got " + doctorsHandler1.loadAllDoctors()[2].getUltimoParto()
+            assert doctorsHandler1.loadAllDoctors()[2].getMinAcomulados() == 250, "testWriteDoctors: The doctors were not written correctly. Expected 250, got " + str(doctorsHandler1.loadAllDoctors()[2].getMinAcomulados())
+            assert doctorsHandler1.loadAllDoctors()[2].getWeeklyWorkedHours() == "32h30", "testWriteDoctors: The doctors were not written correctly. Expected 32h30, got " + doctorsHandler1.loadAllDoctors()[2].getWeeklyWorkedHours()
+            os.remove(expectedFileName)
+        except AssertionError as error:
+            print(f"testWriteDoctors: failed. {error}")
+        print("testWriteDoctors: passed.")
 
 tests = testReaders()
 tests.runTests()

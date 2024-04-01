@@ -10,7 +10,7 @@ class ScheduleItem(object):
     
 
     def __str__(self):
-        return self.time + ", " + str(self.mae) + ", " + str(self.doctor)
+        return str(self.time) + ", " + str(self.mae) + ", " + str(self.doctor) 
     
     def getTime(self):
         return self.time

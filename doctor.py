@@ -30,7 +30,7 @@ class Doctor:
         To return a boolean value True if the doctor has the required skill and False otherwise
         """
         if  mother.getRisco() == 'high' :
-            if self.experiencia == '2' or self.experiencia == '3':
+            if self.experiencia == 2 or self.experiencia == 3:
                 return True
             else:
                 return False
@@ -38,7 +38,7 @@ class Doctor:
 
 
     def __str__(self):
-        return self.nome + ", " + str(self.experiencia) + ", " + str(self.ultimoParto) + ", " + str(self.minAcomulados) + ", " + str(self.ultimoDescanso)
+        return self.nome + ", " + str(self.experiencia) + ", " + str(self.ultimoParto) + ", " + str(self.minAcomulados) + ", " + str(self.weeklyWorkedHours)
     
 
 
@@ -51,8 +51,8 @@ class Doctor:
         Ensures:
         The doctor schedule is updated with the new time
         """
-        self.ultimoParto = newScheduleTime
-        self.minAcomulados = str(int(self.minAcomulados) + 30)
+        self.ultimoParto = dT.updateHours(newScheduleTime)
+        self.minAcomulados = (int(self.minAcomulados) + 30)
         self.weeklyWorkedHours = dT.updateHours(self.weeklyWorkedHours)
 
 

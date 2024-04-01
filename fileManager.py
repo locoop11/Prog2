@@ -29,7 +29,7 @@ class FileManager ():
         except ValueError as e:
             raise ValueError(f"File time error: time format is not correct. Expected format is HHhMM. {e}")
 
-    def saveHeader(self, filename, scheduleDay, scheduleTime):
+    def generateHeader(self):
         """
         Saves the header of the file.
         Requires:
@@ -41,19 +41,21 @@ class FileManager ():
         header is a list of strings with the header of the file
         The header changes according to the filename (schedule or doctors)
         """
-        (newScheduleTime, newScheduleDay) = dateTime.computeNewTimes(self._fileTime, self._fileDay)
+        #(newScheduleTime, newScheduleDay) = dateTime.computeNewTimes(self._fileTime, self._headerDay)
 
         header = []
         header.append("Organization:\n")
         header.append("SmartH\n")
         header.append("Hour:\n")
-        header.append(newScheduleTime + "\n")
+        header.append(self._fileTime + "\n")
         header.append("Day:\n")
-        header.append(newScheduleDay + "\n")
-        if( filename.find("schedule") != -1):
+        header.append(self._headerDay + "\n")
+        if( self._fileType == "Schedule:"):
             header.append("Schedule:\n")
-        else :
+        elif ( self._fileType == "Doctors:"):
             header.append("Doctors:\n")
+        else:
+            raise ValueError(f"Save header error. File type {self._fileType} is unknown.")
 
         return header
     
@@ -70,6 +72,13 @@ class FileManager ():
             if( f != None): 
                 f.close()
 
+    def writeData(self):
+        header = self.generateHeader()
+        with open(self._fileName, "w") as file:
+            for line in header:
+                file.write(line)
+            for line in self._fileContents:
+                file.write(str(line) + "\n")
 
     def removeHeader(self):
         if (len(self._fileContents) == 0):
@@ -99,14 +108,45 @@ class FileManager ():
             raise ValueError("File head error: scope inconsistency between name and header in file " + self._fileName + ".")
 
 
+    def computeNewFileNames (self, scheduleTime, scheduleDay):
+        """
+        Computes the new file names for the schedule and doctors files. File names hour is increased by 30 minutes.
+        Requires:
+        scheduleTime is a string in the format HHhMM with the time of the current schedule
+        scheduleDay is a string in the format DD-MM-YYYY with the day of the current schedule
+        """
+        (newScheduleTime, newScheduleDay) = dateTime.computeNewTimes(scheduleTime, scheduleDay)
+        self._headerTime = newScheduleTime
+        self._headerDay = newScheduleDay
+        
+        if( self._headerType == "Schedule:"):
+            return  "schedule" + newScheduleTime + ".txt"
+        if( self._headerType == "Doctors:"):
+            return  "doctors" + newScheduleTime + ".txt"
 
+        raise ValueError(f"Compute Files error. The file type {self._fileType} is unknown.")
         
 
 class DoctorsHandler(FileManager):
-    def __init__(self, fileName):
-        super().__init__(fileName)
-        self._doctors = []
-       
+    def __init__(self, fileName = "", initialDoctors = [], scheduleDay = None, scheduleTime = None) :
+        doctorsFileName = fileName
+        if( fileName == "" ):
+            if( scheduleDay == None or scheduleTime == None):
+                raise ValueError("ScheduleHandler error: scheduleDay and scheduleTime must be provided when fileName is empty.")
+            self._headerType = "Doctors:"
+            self._fileTime = scheduleTime
+            self._headerTime = scheduleTime
+            self._headerDay = scheduleDay
+            doctorsFileName = self.computeNewFileNames (scheduleTime, scheduleDay)
+                
+        super().__init__(doctorsFileName)
+        self._doctors = initialDoctors
+
+    def writeDoctors(self):
+        for doctor in self._doctors:
+            self._fileContents.append(str(doctor))
+        super().writeData()
+
     def loadAllDoctors(self) :
         self._fileContents = []
         self._doctors = []
@@ -171,22 +211,36 @@ class RequestsHandler(FileManager):
         for mother in self._mothers :
             result += str(mother).strip() + "\n"
         return result
-
-
+ 
 class ScheduleHandler(FileManager):
-    def __init__(self, fileName):
-        super().__init__(fileName)
-        self._scheduleItems = []
-    def __init__(self, initialSchedule, scheduleDay, scheduleTime):
+    def __init__(self, fileName = "", initialSchedule = [], scheduleDay = None, scheduleTime = None):
+        scheduleFileName = fileName
+        if( fileName == "" ):
+            if( scheduleDay == None or scheduleTime == None):
+                raise ValueError("ScheduleHandler error: scheduleDay and scheduleTime must be provided when fileName is empty.")
+            self._headerType = "Schedule:"
+            self._fileTime = scheduleTime
+            self._headerTime = scheduleTime
+            self._headerDay = scheduleDay
+            scheduleFileName = self.computeNewFileNames (scheduleTime, scheduleDay)
+        super().__init__(scheduleFileName)
         self._scheduleItems = initialSchedule
-        self._fileTime = scheduleTime
-        self._headerTime = scheduleTime
-        self._headerDay = scheduleDay
+
+    def writeSchedule(self):
+        for schedule in self._scheduleItems:
+            self._fileContents.append(str(schedule))
+        super().writeData()
+
+    def getScheduleArray (self) :   
+        arr = []
+        for item in self._scheduleItems:
+            arr.append(item)
+        return arr
     
     def getScheduleTime(self):
         return self._headerTime
     
-    def getSchedukleDay(self):
+    def getScheduleDay(self):
         return self._headerDay
     
     def addScheduleItem(self, scheduleItem):
@@ -206,7 +260,7 @@ class ScheduleHandler(FileManager):
             scheduleItem = ScheduleItem(time, motherName, doctorName)
             self._scheduleItems.append(scheduleItem)
         return self._scheduleItems
-
+    
     def __str__(self) -> str:
         result = ""
         for scheduleItem in self._scheduleItems :

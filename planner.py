@@ -1,8 +1,7 @@
 import Doctor as d
 import Mother as m
 import ScheduleItem as s
-import fileManager as fM
-import datetime as dT
+import dateTime as dT
 import re
 from fileManager import  *
 
@@ -35,12 +34,10 @@ class schedulePlanner:
         # schedule exemple: (14h00, Eduarda Elói, Horácio Horta)
 
 
-        # 1. Sort request by priority and doctors by skill
-        newSchedule = self.createNewScheduleBasedOnPrevious(self.schedule, self.scheduleTime, self.scheduleDay)
+        # 1. Create new schedule based on previous
+        newSchedule = self.createNewScheduleBasedOnPrevious(self.schedule.getScheduleArray(), self.scheduleTime, self.scheduleDay)
         (newScheduleTime, newScheduleDay) = dT.computeNewTimes(self.scheduleTime, self.scheduleDay)
-        newScheduleHandler = ScheduleHandler(newSchedule, newScheduleDay, newScheduleTime)
-
-    
+        newScheduleHandler = ScheduleHandler("", newSchedule, self.schedule._headerDay, self.schedule._headerTime)    
 
         for mae in self.maes:
             doctor  = self.getMatchingDoctor(mae, self.doctors) # get the doctor that is the best to do the request
@@ -49,9 +46,9 @@ class schedulePlanner:
                 self.addToNewSchedule(doctor, mae, newScheduleHandler) # Updates doctor and the new schedule 
             else:
                 # If a suitable doctor is not found, send request to another hospital
-                self.sendRequestToOtherHospital(mae, newSchedule, self.scheduleTime)
+                self.sendRequestToOtherHospital(mae, newScheduleHandler, self.scheduleTime)
 
-        return newSchedule
+        return newScheduleHandler
     
     
     def createNewScheduleBasedOnPrevious(self, previousSched, scheduleTime, scheduleDay):
@@ -72,7 +69,7 @@ class schedulePlanner:
         newScheduleDate = newScheduleDay +"|"+newScheduleTime.replace("h", ":")
         newSchedule = []
         for oldSchedule in previousSched:
-            oldScheduleDate = scheduleDay +"|"+oldSchedule[0].replace("h", ":")
+            oldScheduleDate = scheduleDay +"|"+oldSchedule.getTime().replace("h", ":")
             if( dT.biggestDate(oldScheduleDate, newScheduleDate) == oldScheduleDate):
                 newSchedule.append(oldSchedule)
 
@@ -90,17 +87,18 @@ class schedulePlanner:
         doctorScheduleTime = dT.biggestDate(newScheduleHandler.getScheduleDay() +"|"+newScheduleHandler.getScheduleTime().replace("h", ":"), newScheduleHandler.getScheduleDay() +"|"+doctor.getUltimoParto().replace("h", ":"))
         doctorScheduleTime = doctorScheduleTime.split("|")[1].replace(":", "h")
         if( doctorScheduleTime[:2] == "20" and newScheduleHandler.getScheduleTime()[:2] == "04"):
-            newScheduleHandler.addSchedule(ScheduleItem(newScheduleHandler.getScheduleTime(), mae.getNome(), doctor.getNome()))
+            newScheduleHandler.addScheduleItem(ScheduleItem(newScheduleHandler.getScheduleTime(), mae.getNome(), doctor.getNome()))
+        elif ( doctorScheduleTime[:2] == "20"):
+            return newScheduleHandler.addScheduleItem(ScheduleItem(doctorScheduleTime, mae.getNome(), "redirected to other network"))
         else:
-            if( doctorScheduleTime[:2] == "20"):
-                return newScheduleHandler.addSchedule(ScheduleItem(doctorScheduleTime, mae.getNome(), "redirected to other network"))
+            newScheduleHandler.addScheduleItem(ScheduleItem(doctorScheduleTime, mae.getNome(), doctor.getNome()))
         
         doctor.updateDoctor(doctorScheduleTime)
             
     
 
 
-    def sendRequestToOtherHospital(self, mae, newSchedule, scheduleTime):
+    def sendRequestToOtherHospital(self, mae, newScheduleHandler, scheduleTime):
         """
         Writes a request in the newSchedule with the message "redirected to other network" which signals that the request was sent to another hospital either because there are no doctors available 
         or because there are no doctors with the required skill level or even if the doctor does not have available time to perform the request.
@@ -108,8 +106,8 @@ class schedulePlanner:
         Requires:
         request that should be sent to another hospital, the schedule to which append the request to and the time of the schedule
         """	
-        newSchedule.append((scheduleTime, mae.getName(), "redirected to other network"))
-
+        scheduleItem = ScheduleItem(scheduleTime, mae.getNome(), "redirected to other network")
+        newScheduleHandler.addScheduleItem(scheduleItem)
 
 
 
@@ -157,7 +155,7 @@ class schedulePlanner:
         else:
             hours, minutes = 0, 0
         
-        return (-type, accumHours, hours, minutes)
+        return (accumHours, hours, minutes)
 
         
     def prioritezeDoctors(self, listOfMatchingDoctors):

@@ -1,29 +1,14 @@
-import mae as m
-import doctor as d
+
 import ScheduleItem as s
 from fileManager import  *
 from planner import  * 
 import dateTime as dT
 
-class runner (object):
+class Runner (object):
     def __init__(self, doctorsFileName, mothersFileName, scheduleFileName):
         self.doctorFileName = doctorsFileName
         self.maeFileName = mothersFileName
         self.scheduleFileName = scheduleFileName
-
-    def computeNewFileNames (self, scheduleTime, scheduleDay):
-        """
-        Computes the new file names for the schedule and doctors files. File names hour is increased by 30 minutes.
-        Requires:
-        scheduleTime is a string in the format HHhMM with the time of the current schedule
-        scheduleDay is a string in the format DD-MM-YYYY with the day of the current schedule
-        """
-        (newScheduleTime, newScheduleDay) = dT.computeNewTimes(scheduleTime, scheduleDay)
-        
-        newScheduleFileName = "schedule" + newScheduleTime + ".txt"
-        newDoctorsFileName = "doctors" + newScheduleTime + ".txt"
-
-        return (newScheduleFileName, newDoctorsFileName)
     
     
 
@@ -31,16 +16,25 @@ class runner (object):
         doctorsHandler = DoctorsHandler(self.doctorFileName)
         mothersHandler = RequestsHandler(self.maeFileName)
         scheduleHandler = ScheduleHandler(self.scheduleFileName)
+        scheduleHandler.loadAllSchedules()
 
         planner = schedulePlanner(doctorsHandler.loadAllDoctors(), 
-                                  RequestsHandler.loadAllRequestsOrderedByPriority(), 
-                                  scheduleHandler.loadAllSchedules())
-        planner.updateSchedule()
+                                  mothersHandler.loadAllRequestsOrderedByPriority(), 
+                                  scheduleHandler)
+        newScheduleHandler = planner.updateSchedule()
         updatedDoctors = planner.getDoctors()
-        newSchedule = planner.getSchedule()
+
+        newScheduleHandler.writeSchedule()
+        newDoctorsHandler = DoctorsHandler("", updatedDoctors, scheduleHandler.getScheduleDay(), scheduleHandler.getScheduleTime())
+        newDoctorsHandler.writeDoctors()
 
 
+def main():
+    runner = Runner("./testSets_v1/testSet1/doctors10h00.txt", "./testSets_v1/testSet1/requests10h30.txt", "./testSets_v1/testSet1/schedule10h00.txt")
+    runner.run()
 
 
+if __name__ == "__main__":
+    main()
         
 
