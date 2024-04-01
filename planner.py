@@ -145,7 +145,6 @@ class schedulePlanner:
         """
         type = int(arr.getExperiencia())
         timeLastIntervention = int(arr.getUltimoParto().split("h")[0])*60 + int(arr.getUltimoParto().split("h")[1])
-        print(str(timeLastIntervention) + ", " + arr.getUltimoParto())
         accumHours = 999999
         if( arr.getMinAcomulados() != "weekly leave"):
             accumHours = int(arr.getMinAcomulados())
