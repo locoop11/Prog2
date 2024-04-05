@@ -44,7 +44,7 @@ class TestPlanner :
         assert numItemsAfter == numItemsBefore + 1, "The number of items in the schedule should have increased by 1"
         assert abilioAmaral.getUltimoParto() == '11h35', "The doctor's last birth should have been updated to 11h35"
         message = "The doctor's accumulated minutes should have been updated to 210, but is " + str(abilioAmaral.getMinAcomulados())
-        assert abilioAmaral.getMinAcomulados() == '210', message
+        assert abilioAmaral.getMinAcomulados() == 210, message
         message = "The doctor's worked hours since last break should have been updated to 28h30, but is " + abilioAmaral.getWeeklyWorkedHours()
         assert abilioAmaral.getWeeklyWorkedHours() == '28h30', message
 

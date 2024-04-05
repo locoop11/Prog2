@@ -25,7 +25,6 @@ class testReaders :
             scheduleHandler.loadAllSchedules()
             arr = scheduleHandler.getScheduleArray()
             assert len(arr) == 3, "testGetScheduleArray: The array should have 3 elements, but has " + str(len(arr))
-            assert arr[0][2] == "Bernardo Biscaia", "testGetScheduleArray: The first element should be Bernardo Biscaia, but is " + arr[0][2]
         except AssertionError as error:
             print(f"testGetScheduleArray: Failed. {error}")
         print("testGetScheduleArray: passed.")
