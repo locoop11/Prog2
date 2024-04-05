@@ -1,5 +1,5 @@
 
-from doctor import Doctor as Doctor 
+from Doctor import Doctor as Doctor 
 from Mother import Mother as Mother
 from ScheduleItem import ScheduleItem as ScheduleItem
 import dateTime as dateTime
