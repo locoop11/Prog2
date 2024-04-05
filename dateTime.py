@@ -86,7 +86,7 @@ def addHoursToDateTime(dateTime, hours):
     # Compute current run date and time (which is 30 minutes after last run date unless it's a new day)
     if( newHour >= const.END_OF_DAY_INT_HOUR ):
         # This day is over we should start a new day based on todays date
-        newTime = datetime.strptime(date, '%d:%m:%Y') + timedelta(days=1)
+        newTime = str(time(date, '%d:%m:%Y') + timedelta(days=1))
         returnDate = newTime.strftime("%d:%m:%Y") + "|" + const.START_OF_DAY_STRING_TIME
     else:
         # We are still in the same day

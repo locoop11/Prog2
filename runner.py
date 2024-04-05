@@ -76,8 +76,6 @@ def main():
     exit(1)  # Exit with a non-zero exit code to indicate an error
     
     
-    runner = Runner("./testSets_v1/testSet1/doctors10h00.txt", "./testSets_v1/testSet1/requests10h30.txt", "./testSets_v1/testSet1/schedule10h00.txt")
-    runner.run()
 
 
 if __name__ == "__main__":
