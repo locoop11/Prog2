@@ -1,4 +1,4 @@
-from Doctor import Doctor as Doctor
+from Doctor_1 import Doctor as Doctor
 from fileManager import ScheduleHandler as ScheduleHandler
 from fileManager import RequestsHandler as RequestsHandler
 from planner import *
