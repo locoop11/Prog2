@@ -1,4 +1,11 @@
+# 2023-2024 Programação 1 (LTI)
+# Grupo 26
+# 60231 Tiago Carvalho
+# 60253 Hugo Silva
+
+
 import dateTime as dT
+
 
 class Doctor:
     def __init__(self, nome, experiencia, ultimoParto, minAcomulados, weeklyWorkedHours):

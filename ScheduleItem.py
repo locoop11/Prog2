@@ -1,3 +1,10 @@
+# 2023-2024 Programação 1 (LTI)
+# Grupo 26
+# 60231 Tiago Carvalho
+# 60253 Hugo Silva
+
+
+
 class ScheduleItem(object):
     def __init__(self, time, mae, doctor):
         self.time = time
